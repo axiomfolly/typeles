@@ -28,7 +28,7 @@ body {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 12px;
 }
-#progress-dots { display: flex; gap: 8px; }
+#progress-dots { display: flex; gap: 8px; flex-wrap: wrap; max-width: 400px; }
 .dot {
   width: 14px; height: 14px; border-radius: 50%;
   background: #334; border: 2px solid #556;
@@ -36,6 +36,9 @@ body {
 }
 .dot.done { background: #ffd700; border-color: #ffa500; }
 .dot.active { background: #4af; border-color: #08f; box-shadow: 0 0 8px #4af; }
+.dot.mini { width: 9px; height: 9px; }
+.dot.godmode-dot { cursor: pointer; }
+.dot.godmode-dot:hover { transform: scale(1.5); box-shadow: 0 0 8px #ffd700; border-color: #ffd700; }
 #star-counter {
   font-size: 1.1rem; color: #ffd700; display: flex; align-items: center; gap: 6px;
 }
@@ -48,8 +51,14 @@ body {
 /* Level title */
 #level-title {
   font-size: 1rem; color: #8af; letter-spacing: 2px; text-transform: uppercase;
-  margin-bottom: 8px;
+  margin-bottom: 8px; transition: color .2s;
 }
+#level-title.godmode-title {
+  cursor: pointer;
+  text-decoration: underline dotted #ffd700;
+  color: #ffd700;
+}
+#level-title.godmode-title:hover { color: #ffec60; }
 
 /* Target display */
 #target-wrap {
@@ -181,6 +190,98 @@ body {
   font-size: 1rem; padding: 10px 24px;
 }
 #stars-display { font-size: 3rem; }
+
+/* ===== CHARACTER REVEAL CARD ===== */
+@keyframes reveal-scale-in {
+  from { opacity: 0; transform: scale(.82); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes emoji-pop {
+  0%   { transform: scale(0) rotate(-20deg); }
+  55%  { transform: scale(1.25) rotate(6deg); }
+  75%  { transform: scale(.92) rotate(-3deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+@keyframes slide-up-in {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.char-reveal {
+  position: fixed; inset: 0; z-index: 200;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 14px; cursor: pointer;
+  animation: reveal-scale-in .4s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+.reveal-emoji {
+  font-size: 5.5rem; line-height: 1;
+  animation: emoji-pop .65s cubic-bezier(.34,1.56,.64,1) .05s both;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,.35));
+}
+.reveal-name {
+  font-size: 2.8rem; font-weight: bold; color: #fff;
+  text-shadow: 0 2px 20px rgba(0,0,0,.5);
+  text-transform: capitalize;
+  animation: slide-up-in .4s ease .15s both;
+}
+.reveal-quote {
+  font-size: 1.25rem; font-style: italic; color: rgba(255,255,255,.92);
+  text-align: center; max-width: 520px; padding: 0 24px;
+  text-shadow: 0 1px 8px rgba(0,0,0,.4);
+  animation: slide-up-in .4s ease .25s both;
+}
+.reveal-img-wrap {
+  height: 130px; display: flex; align-items: center; justify-content: center;
+  animation: slide-up-in .4s ease .3s both;
+}
+.reveal-img {
+  width: 120px; height: 120px; object-fit: cover;
+  border-radius: 18px; border: 3px solid rgba(255,255,255,.45);
+  box-shadow: 0 8px 32px rgba(0,0,0,.45);
+}
+.reveal-hint {
+  font-size: .82rem; color: rgba(255,255,255,.55);
+  letter-spacing: 1.5px; text-transform: uppercase;
+  margin-top: 6px;
+  animation: slide-up-in .4s ease .4s both;
+}
+
+/* ===== GODMODE FLASH ===== */
+#godmode-flash {
+  position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+  background: linear-gradient(135deg, #ffd700, #ff8c00);
+  color: #000; font-weight: bold; font-size: 1.1rem;
+  padding: 10px 28px; border-radius: 28px;
+  box-shadow: 0 4px 24px rgba(255,200,0,.55);
+  z-index: 400; pointer-events: none;
+  animation: godflash 2.8s ease forwards;
+}
+@keyframes godflash {
+  0%   { opacity:0; transform:translateX(-50%) translateY(-18px) scale(.9); }
+  12%  { opacity:1; transform:translateX(-50%) translateY(0)     scale(1.05); }
+  20%  { transform:translateX(-50%) translateY(0) scale(1); }
+  75%  { opacity:1; }
+  100% { opacity:0; transform:translateX(-50%) translateY(-10px); }
+}
+
+/* ===== LEVEL SELECT MODAL (godmode) ===== */
+#level-select-modal {
+  position: fixed; inset: 0; z-index: 150;
+  background: rgba(0,0,10,.88);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 10px;
+}
+#level-select-modal h2 { font-size: 1.5rem; color: #ffd700; margin-bottom: 6px; }
+.level-select-btn {
+  width: 340px; text-align: left; padding: 10px 22px;
+  font-size: 1rem; font-weight: bold;
+  border: none; border-radius: 10px; cursor: pointer;
+  background: linear-gradient(135deg, #2a3a50, #1a2535);
+  color: #cce; transition: all .15s;
+}
+.level-select-btn:hover { background: linear-gradient(135deg, #3a5070, #2a3550); color: #fff; }
+.level-select-btn.current-level { background: linear-gradient(135deg, #4af, #08f); color: #fff; }
 </style>
 </head>
 <body>
@@ -205,26 +306,19 @@ body {
 <div id="mascot-wrap">
   <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
     <ellipse cx="40" cy="62" rx="20" ry="8" fill="#1a1a3a" opacity=".5"/>
-    <!-- Body -->
     <rect x="22" y="38" width="36" height="28" rx="8" fill="#3a5fa0"/>
-    <!-- Helmet -->
     <circle cx="40" cy="30" r="20" fill="#2a4a80"/>
     <circle cx="40" cy="30" r="16" fill="#c8e8ff" opacity=".9"/>
-    <!-- Face -->
     <circle cx="34" cy="28" r="4" fill="#0a0a2a"/>
     <circle cx="46" cy="28" r="4" fill="#0a0a2a"/>
     <circle cx="35" cy="27" r="1.5" fill="#fff"/>
     <circle cx="47" cy="27" r="1.5" fill="#fff"/>
     <path d="M34 35 Q40 40 46 35" stroke="#0a0a2a" stroke-width="2" fill="none" stroke-linecap="round"/>
-    <!-- Arms -->
     <rect x="8" y="40" width="14" height="8" rx="4" fill="#3a5fa0"/>
     <rect x="58" y="40" width="14" height="8" rx="4" fill="#3a5fa0"/>
-    <!-- Legs -->
     <rect x="26" y="62" width="10" height="12" rx="4" fill="#2a4a80"/>
     <rect x="44" y="62" width="10" height="12" rx="4" fill="#2a4a80"/>
-    <!-- Helmet ring -->
     <circle cx="40" cy="30" r="20" fill="none" stroke="#5a8ad0" stroke-width="2"/>
-    <!-- Antenna -->
     <line x1="40" y1="10" x2="40" y2="2" stroke="#5a8ad0" stroke-width="2"/>
     <circle cx="40" cy="2" r="3" fill="#ffd700"/>
   </svg>
@@ -270,8 +364,60 @@ const LEVELS = [
     name: 'Niveau 6 — Zinnen',
     desc: 'Typ de zin',
     items: ['de kat zit','een rode bal','de hond loopt','ik typ goed','de zon schijnt','een grote boom','de vis zwemt','hallo wereld']
+  },
+  {
+    name: 'Niveau 7 — Tekenfilmhelden',
+    desc: 'Typ de naam van het karakter',
+    bonus: true,
+    items: [
+      'hilda','twijg',
+      'fin','jake',
+      'spongebob','patrick',
+      'alfred jodocus kwak','henk','winnie',
+      'ladybug','cat noir',
+      'pikachu','eevee','charmander',
+      'rumi','mira','jinu','zoey',
+      'smurfin','brilsmurf','grote smurf','luilaksmurf',
+      'kirby','prinses peach','yoshi','mario',
+      'stitch','lilo','angel',
+      'jasmine','aladdin'
+    ]
   }
 ];
+
+const BONUS_CHARACTERS = {
+  'hilda':               { emoji:'🧢', bg:'#2a5a8a,#4a8ab5', wiki:'Hilda_(TV_series)',                  quote:'Er is vast een magische verklaring!' },
+  'twijg':               { emoji:'🦌', bg:'#8b6914,#b89040', wiki:null,                                  quote:'*kijkt met grote ogen* ♡' },
+  'fin':                 { emoji:'⚔️', bg:'#6ab0c8,#3a80a0', wiki:'Finn_the_Human',                     quote:'Algebraïsch! Dat is helemaal episch!' },
+  'jake':                { emoji:'🐕', bg:'#e8a030,#c07820', wiki:'Jake_the_Dog',                        quote:'Het is wiskunde, broertje!' },
+  'spongebob':           { emoji:'🧽', bg:'#f0d020,#c0a800', wiki:'SpongeBob_SquarePants_(character)',   quote:'Ben jij klaar? IK BEN KLAAR!' },
+  'patrick':             { emoji:'⭐', bg:'#d46080,#b04060', wiki:'Patrick_Star_(character)',            quote:'Is mayonaise een instrument?' },
+  'alfred jodocus kwak': { emoji:'🦆', bg:'#f0a030,#c07810', wiki:'Alfred_Jodocus_Kwak',                quote:'Alles komt goed, dat weet ik zeker!' },
+  'henk':                { emoji:'🐾', bg:'#786050,#504030', wiki:null,                                  quote:'Dag Alfred! Fijn je te zien!' },
+  'winnie':              { emoji:'🐘', bg:'#a090c0,#706090', wiki:null,                                  quote:'Vriendschap is het allermooiste!' },
+  'ladybug':             { emoji:'🐞', bg:'#cc1122,#990011', wiki:'Miraculous_Ladybug_(character)',      quote:'Pas op, schurk! Miraculous Ladybug!' },
+  'cat noir':            { emoji:'🐱', bg:'#181828,#303050', wiki:'Cat_Noir',                            quote:'Cataclysme! Wacht... nog niet.' },
+  'pikachu':             { emoji:'⚡', bg:'#f0c800,#c09600', wiki:'Pikachu',                             quote:'Pika pika!' },
+  'eevee':               { emoji:'🦊', bg:'#c07840,#8a4820', wiki:'Eevee',                              quote:'Eevee eev!' },
+  'charmander':          { emoji:'🔥', bg:'#e84020,#b02000', wiki:'Charmander',                         quote:'Char char charmander!' },
+  'rumi':                { emoji:'✨', bg:'#c030a0,#902080', wiki:null,                                  quote:'Samen zijn we sterker!' },
+  'mira':                { emoji:'🔭', bg:'#2060c0,#104090', wiki:null,                                  quote:'Ik los dit mysterie op!' },
+  'jinu':                { emoji:'🎵', bg:'#20a060,#107040', wiki:null,                                  quote:'Muziek verbindt ons allemaal!' },
+  'zoey':                { emoji:'🌟', bg:'#e08020,#b05000', wiki:null,                                  quote:'Vrienden voor altijd!' },
+  'smurfin':             { emoji:'💛', bg:'#40a8e0,#2080b0', wiki:'Smurfette',                          quote:'Smurfelijk! Jullie zijn geweldig!' },
+  'brilsmurf':           { emoji:'🤓', bg:'#2870c0,#1050a0', wiki:'Brainy_Smurf',                       quote:'Zoals ik altijd zeg in deel twee, hoofdstuk drie...' },
+  'grote smurf':         { emoji:'🎩', bg:'#c02020,#901010', wiki:'Papa_Smurf',                         quote:'Nu luister goed, kleine smurfen!' },
+  'luilaksmurf':         { emoji:'😴', bg:'#1858a8,#104080', wiki:'Lazy_Smurf',                         quote:'Zzzzz... o, al klaar?' },
+  'kirby':               { emoji:'🩷', bg:'#f090c0,#d06090', wiki:'Kirby_(character)',                  quote:'Poyo!' },
+  'prinses peach':       { emoji:'👑', bg:'#f0a0b8,#c07080', wiki:'Princess_Peach',                     quote:'Dankjewel, Mario!' },
+  'yoshi':               { emoji:'🦕', bg:'#40b840,#208020', wiki:'Yoshi',                              quote:'Yoshi!' },
+  'mario':               { emoji:'🍄', bg:'#c82010,#901000', wiki:'Mario',                              quote:'Mama mia, dat is geweldig!' },
+  'stitch':              { emoji:'💙', bg:'#3060d0,#1840a0', wiki:'Stitch_(Disney)',                    quote:'Ohana betekent familie!' },
+  'lilo':                { emoji:'🌺', bg:'#d06040,#a04020', wiki:'Lilo_%26_Stitch',                    quote:'Ohana betekent familie, en familie laat je nooit in de steek!' },
+  'angel':               { emoji:'💕', bg:'#e060a0,#b03070', wiki:null,                                 quote:'Aloha, oe...' },
+  'jasmine':             { emoji:'🌙', bg:'#20b0b0,#108080', wiki:'Princess_Jasmine',                   quote:'Ik ben geen prijs om te winnen!' },
+  'aladdin':             { emoji:'🧞', bg:'#c09030,#907010', wiki:'Aladdin_(Disney_character)',         quote:'Vertrouw me... het is magie!' },
+};
 
 // Keyboard layout with finger zones
 const KB_ROWS = [
@@ -295,20 +441,26 @@ let streak = 0;
 let mistakes = 0;
 let totalChars = 0;
 let audioCtx = null;
+let lessonItems = [];
+let revealActive = false;  // blocks game input during character reveal
+
+// Godmode state
+let godmodeActive = false;
+let godmodeBuffer = '';
+const GODMODE_CODE = 'godmode';
 
 const ITEMS_PER_LESSON = 8;
 
 function getItems() {
   const lvl = LEVELS[currentLevel];
+  // Bonus level: shuffle and take ITEMS_PER_LESSON
   const items = [...lvl.items];
-  // shuffle for variety
-  for(let i=items.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [items[i],items[j]]=[items[j],items[i]];
+  for (let i = items.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [items[i], items[j]] = [items[j], items[i]];
   }
   return items.slice(0, ITEMS_PER_LESSON);
 }
-let lessonItems = [];
 
 // ==================== AUDIO ====================
 function getAudio() {
@@ -329,15 +481,18 @@ function playTone(freq, type, dur, vol=0.3) {
   } catch(e) {}
 }
 function playCorrect() { playTone(880, 'sine', .12, .2); }
-function playWrong() { playTone(180, 'sawtooth', .15, .15); }
+function playWrong()   { playTone(180, 'sawtooth', .15, .15); }
 function playWord() {
-  if(!soundOn) return;
+  if (!soundOn) return;
   [523,659,784,1047].forEach((f,i) => setTimeout(() => playTone(f,'sine',.15,.2), i*80));
 }
 function playFanfare() {
-  if(!soundOn) return;
-  const notes = [523,587,659,698,784,880,988,1047];
-  notes.forEach((f,i) => setTimeout(() => playTone(f,'sine',.2,.25), i*100));
+  if (!soundOn) return;
+  [523,587,659,698,784,880,988,1047].forEach((f,i) => setTimeout(() => playTone(f,'sine',.2,.25), i*100));
+}
+function playRevealJingle() {
+  if (!soundOn) return;
+  [784,988,1175,1568].forEach((f,i) => setTimeout(() => playTone(f,'sine',.25,.22), i*90));
 }
 function toggleSound() {
   soundOn = !soundOn;
@@ -349,10 +504,10 @@ function initStars() {
   const c = document.getElementById('stars-bg');
   const ctx2 = c.getContext('2d');
   c.width = window.innerWidth; c.height = window.innerHeight;
-  for(let i=0;i<200;i++){
-    const x=Math.random()*c.width, y=Math.random()*c.height;
-    const r=Math.random()*1.5+.5;
-    ctx2.fillStyle=`rgba(255,255,255,${Math.random()*.8+.2})`;
+  for (let i = 0; i < 200; i++) {
+    const x = Math.random()*c.width, y = Math.random()*c.height;
+    const r = Math.random()*1.5+.5;
+    ctx2.fillStyle = `rgba(255,255,255,${Math.random()*.8+.2})`;
     ctx2.beginPath(); ctx2.arc(x,y,r,0,Math.PI*2); ctx2.fill();
   }
 }
@@ -376,11 +531,22 @@ function buildKeyboard() {
 }
 
 function buildProgressDots() {
+  const total = lessonItems.length;
   const dots = document.getElementById('progress-dots');
   dots.innerHTML = '';
-  for(let i=0;i<ITEMS_PER_LESSON;i++){
+  const mini = total > 10;
+  for (let i = 0; i < total; i++) {
     const d = document.createElement('div');
-    d.className = 'dot' + (i < currentItemIdx ? ' done' : i === currentItemIdx ? ' active' : '');
+    let cls = 'dot';
+    if (mini) cls += ' mini';
+    if (i < currentItemIdx)    cls += ' done';
+    else if (i === currentItemIdx) cls += ' active';
+    if (godmodeActive)         cls += ' godmode-dot';
+    d.className = cls;
+    if (godmodeActive) {
+      d.title = lessonItems[i] || `Item ${i+1}`;
+      d.addEventListener('click', ((idx) => () => jumpToItem(idx))(i));
+    }
     dots.appendChild(d);
   }
 }
@@ -391,6 +557,10 @@ function renderTarget() {
   const target = lessonItems[currentItemIdx];
   if (!target) return;
 
+  // Adaptive font size for long words/names
+  const len = target.length;
+  const fontSize = len > 16 ? '1.8rem' : len > 12 ? '2.6rem' : len > 8 ? '3.5rem' : len > 5 ? '4.2rem' : '5rem';
+
   [...target].forEach((ch, i) => {
     const box = document.createElement('div');
     box.className = 'letter-box';
@@ -399,43 +569,42 @@ function renderTarget() {
       (ch === ' ' ? ' space-char' : '') +
       (i < currentCharIdx ? ' typed' : i === currentCharIdx ? ' current' : '');
     span.dataset.idx = i;
+    span.style.fontSize = ch === ' ' ? '' : fontSize;
     span.textContent = ch === ' ' ? '␣' : ch.toUpperCase();
     box.appendChild(span);
     wrap.appendChild(box);
   });
 
-  // Highlight active key on keyboard
+  // Highlight active key
   document.querySelectorAll('.key').forEach(k => k.classList.remove('active-key'));
   const nextChar = target[currentCharIdx];
-  if(nextChar) {
+  if (nextChar) {
     const keyEl = document.querySelector(`.key[data-key="${nextChar === ' ' ? ' ' : nextChar}"]`);
-    if(keyEl) keyEl.classList.add('active-key');
+    if (keyEl) keyEl.classList.add('active-key');
   }
 
-  document.getElementById('instruction').textContent =
-    LEVELS[currentLevel].desc;
+  document.getElementById('instruction').textContent = LEVELS[currentLevel].desc;
 }
 
 function updateStreak() {
   const el = document.getElementById('streak-display');
-  if(streak >= 5) el.textContent = `🔥 ${streak} op rij!`;
-  else if(streak >= 3) el.textContent = `✨ Goed bezig! ${streak} op rij`;
-  else el.textContent = '';
+  if (streak >= 5)      el.textContent = `🔥 ${streak} op rij!`;
+  else if (streak >= 3) el.textContent = `✨ Goed bezig! ${streak} op rij`;
+  else                  el.textContent = '';
 }
 
-// ==================== CONFETTI ====================
+// ==================== CONFETTI + FLOAT ====================
 function spawnConfetti(x, y) {
   const colors = ['#ffd700','#ff6b6b','#4af','#90d030','#ff9f40'];
-  for(let i=0;i<12;i++){
+  for (let i = 0; i < 12; i++) {
     const el = document.createElement('div');
     el.className = 'confetti-piece';
     el.style.cssText = `left:${x}px;top:${y}px;background:${colors[Math.floor(Math.random()*colors.length)]};
-      --cx:${(Math.random()-0.5)*120}px;--cy:${-(Math.random()*80+40)}px`;
+      --cx:${(Math.random()-.5)*120}px;--cy:${-(Math.random()*80+40)}px`;
     document.body.appendChild(el);
     setTimeout(() => el.remove(), 1000);
   }
 }
-
 function floatWord(text, x, y) {
   const el = document.createElement('div');
   el.className = 'float-word';
@@ -448,28 +617,186 @@ function floatWord(text, x, y) {
 // ==================== MASCOT ====================
 function mascotBounce() {
   const m = document.getElementById('mascot-wrap');
-  m.classList.remove('bounce','spin');
-  void m.offsetWidth;
+  m.classList.remove('bounce','spin'); void m.offsetWidth;
   m.classList.add('bounce');
   setTimeout(() => m.classList.remove('bounce'), 500);
 }
 function mascotSpin() {
   const m = document.getElementById('mascot-wrap');
-  m.classList.remove('bounce','spin');
-  void m.offsetWidth;
+  m.classList.remove('bounce','spin'); void m.offsetWidth;
   m.classList.add('spin');
   setTimeout(() => m.classList.remove('spin'), 600);
+}
+
+// ==================== WIKI IMAGE ====================
+async function fetchWikiImage(wikiTitle) {
+  if (!wikiTitle) return null;
+  try {
+    const resp = await fetch(
+      `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(wikiTitle)}`
+    );
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    return data.thumbnail?.source || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+// ==================== CHARACTER REVEAL CARD ====================
+function showCharacterReveal(charKey, onDismiss) {
+  const data = BONUS_CHARACTERS[charKey] || {
+    emoji: '⭐', bg: '#334455,#223344', wiki: null, quote: 'Geweldig getypt!'
+  };
+  const [bg1, bg2] = data.bg.split(',');
+
+  playRevealJingle();
+
+  const card = document.createElement('div');
+  card.className = 'char-reveal';
+  card.style.background = `linear-gradient(135deg, ${bg1}, ${bg2})`;
+
+  // Display name: capitalize each word
+  const displayName = charKey.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
+  card.innerHTML = `
+    <div class="reveal-emoji">${data.emoji}</div>
+    <div class="reveal-name">${displayName}</div>
+    <div class="reveal-quote">"${data.quote}"</div>
+    <div class="reveal-img-wrap" id="reveal-img-wrap"></div>
+    <div class="reveal-hint">Druk op Enter om verder te gaan</div>
+  `;
+  document.body.appendChild(card);
+
+  // Async wiki image
+  if (data.wiki) {
+    fetchWikiImage(data.wiki).then(url => {
+      if (!url) return;
+      const wrap = document.getElementById('reveal-img-wrap');
+      if (!wrap) return;
+      const img = document.createElement('img');
+      img.className = 'reveal-img';
+      img.src = url;
+      img.alt = displayName;
+      wrap.appendChild(img);
+    });
+  }
+
+  // Dismiss logic
+  function dismiss() {
+    if (!card.parentNode) return;
+    card.remove();
+    revealActive = false;
+    onDismiss();
+  }
+
+  // Keyboard: Enter or Space
+  function keyHandler(e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      document.removeEventListener('keydown', keyHandler);
+      dismiss();
+    }
+  }
+  document.addEventListener('keydown', keyHandler);
+
+  // Click anywhere on card
+  card.addEventListener('click', () => {
+    document.removeEventListener('keydown', keyHandler);
+    dismiss();
+  }, { once: true });
+}
+
+// ==================== GODMODE ====================
+function activateGodmode() {
+  if (godmodeActive) return;
+  godmodeActive = true;
+
+  // Flash message
+  const flash = document.createElement('div');
+  flash.id = 'godmode-flash';
+  flash.textContent = '🔓 God Mode actief!';
+  document.body.appendChild(flash);
+  setTimeout(() => flash.remove(), 3000);
+
+  // Rebuild dots with click handlers
+  buildProgressDots();
+
+  // Make level title clickable
+  applyGodmodeTitle();
+}
+
+function applyGodmodeTitle() {
+  const titleEl = document.getElementById('level-title');
+  if (!titleEl) return;
+  if (godmodeActive) {
+    titleEl.classList.add('godmode-title');
+    titleEl.title = 'Klik om van niveau te wisselen';
+    titleEl.onclick = showLevelSelect;
+  }
+}
+
+function jumpToItem(idx) {
+  if (idx < 0 || idx >= lessonItems.length) return;
+  currentItemIdx = idx;
+  currentCharIdx = 0;
+  buildProgressDots();
+  renderTarget();
+}
+
+function showLevelSelect() {
+  // Remove any existing modal
+  const existing = document.getElementById('level-select-modal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'level-select-modal';
+
+  const heading = document.createElement('h2');
+  heading.textContent = '🔓 Kies een niveau';
+  modal.appendChild(heading);
+
+  LEVELS.forEach((lvl, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'level-select-btn' + (idx === currentLevel ? ' current-level' : '');
+    btn.textContent = (idx === currentLevel ? '▶ ' : '    ') + lvl.name;
+    btn.addEventListener('click', () => {
+      modal.remove();
+      currentLevel = idx;
+      document.getElementById('overlay').classList.add('hidden');
+      startLevel();
+    });
+    modal.appendChild(btn);
+  });
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.className = 'level-select-btn';
+  cancelBtn.textContent = '    ✕ Annuleren';
+  cancelBtn.style.marginTop = '8px';
+  cancelBtn.addEventListener('click', () => modal.remove());
+  modal.appendChild(cancelBtn);
+
+  // Click backdrop to close
+  modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+
+  // Escape to close
+  function escHandler(e) {
+    if (e.key === 'Escape') { document.removeEventListener('keydown', escHandler); modal.remove(); }
+  }
+  document.addEventListener('keydown', escHandler);
+
+  document.body.appendChild(modal);
 }
 
 // ==================== GAME LOGIC ====================
 function startGame() {
   document.getElementById('overlay').classList.add('hidden');
   const saved = localStorage.getItem('typeles_progress');
-  if(saved) {
+  if (saved) {
     try {
       const p = JSON.parse(saved);
       currentLevel = p.level || 0;
-      totalStars = p.stars || 0;
+      totalStars   = p.stars  || 0;
     } catch(e) {}
   }
   document.getElementById('star-count').textContent = totalStars;
@@ -479,60 +806,87 @@ function startGame() {
 function startLevel() {
   currentItemIdx = 0;
   currentCharIdx = 0;
-  mistakes = 0;
+  mistakes   = 0;
   totalChars = 0;
-  streak = 0;
-  lessonItems = getItems();
-  document.getElementById('level-title').textContent = LEVELS[currentLevel].name;
+  streak     = 0;
+  revealActive = false;
+  lessonItems  = getItems();
+
+  const titleEl = document.getElementById('level-title');
+  titleEl.textContent = LEVELS[currentLevel].name;
+  titleEl.classList.remove('godmode-title');
+  titleEl.onclick = null;
+  titleEl.title = '';
+  if (godmodeActive) applyGodmodeTitle();
+
   buildProgressDots();
   renderTarget();
   updateStreak();
 }
 
 function handleKey(key) {
-  if(currentItemIdx >= lessonItems.length) return;
+  if (revealActive) return;
+  if (currentItemIdx >= lessonItems.length) return;
+
   const target = lessonItems[currentItemIdx];
   const expectedChar = target[currentCharIdx];
 
-  if(key === ' ' && expectedChar !== ' ') return; // ignore space unless expected
+  if (key === ' ' && expectedChar !== ' ') return;
 
   const isCorrect = key.toLowerCase() === expectedChar.toLowerCase();
   totalChars++;
 
-  // Flash key
   const keyEl = document.querySelector(`.key[data-key="${key === ' ' ? ' ' : key.toLowerCase()}"]`);
 
-  if(isCorrect) {
+  if (isCorrect) {
     playCorrect();
     streak++;
-    if(keyEl) { keyEl.classList.add('correct-flash'); setTimeout(()=>keyEl.classList.remove('correct-flash'),200); }
+    if (keyEl) { keyEl.classList.add('correct-flash'); setTimeout(() => keyEl.classList.remove('correct-flash'), 200); }
 
-    // Mark typed
     const span = document.querySelector(`.target-char[data-idx="${currentCharIdx}"]`);
-    if(span) { span.classList.remove('current'); span.classList.add('typed'); }
+    if (span) { span.classList.remove('current'); span.classList.add('typed'); }
 
     currentCharIdx++;
     updateStreak();
 
-    if(streak === 3 || streak === 6 || streak === 9) mascotBounce();
+    if (streak === 3 || streak === 6 || streak === 9) mascotBounce();
 
-    if(currentCharIdx >= target.length) {
-      // Word/item complete
+    if (currentCharIdx >= target.length) {
+      // Item complete
       const wrap = document.getElementById('target-wrap');
       const rect = wrap.getBoundingClientRect();
       spawnConfetti(rect.left + rect.width/2, rect.top + rect.height/2);
       floatWord('✓ ' + target, rect.left + rect.width/2, rect.top);
       playWord();
-      if(streak >= 5) mascotSpin();
+      if (streak >= 5) mascotSpin();
 
-      currentItemIdx++;
-      currentCharIdx = 0;
       buildProgressDots();
 
-      if(currentItemIdx >= lessonItems.length) {
-        setTimeout(showLessonComplete, 600);
+      // Level 7 bonus: show character reveal card
+      if (LEVELS[currentLevel].bonus) {
+        revealActive = true;
+        setTimeout(() => {
+          showCharacterReveal(target, () => {
+            // after dismiss
+            currentItemIdx++;
+            currentCharIdx = 0;
+            buildProgressDots();
+            if (currentItemIdx >= lessonItems.length) {
+              setTimeout(showLessonComplete, 400);
+            } else {
+              renderTarget();
+            }
+          });
+        }, 350);
       } else {
-        setTimeout(renderTarget, 500);
+        currentItemIdx++;
+        currentCharIdx = 0;
+        buildProgressDots();
+        if (currentItemIdx >= lessonItems.length) {
+          setTimeout(showLessonComplete, 600);
+        } else {
+          setTimeout(renderTarget, 500);
+        }
       }
     } else {
       renderTarget();
@@ -542,14 +896,10 @@ function handleKey(key) {
     mistakes++;
     streak = 0;
     updateStreak();
-    if(keyEl) { keyEl.classList.add('wrong-flash'); setTimeout(()=>keyEl.classList.remove('wrong-flash'),300); }
+    if (keyEl) { keyEl.classList.add('wrong-flash'); setTimeout(() => keyEl.classList.remove('wrong-flash'), 300); }
 
-    // Wobble current char
     const span = document.querySelector(`.target-char[data-idx="${currentCharIdx}"]`);
-    if(span) {
-      span.classList.add('wrong');
-      setTimeout(() => span.classList.remove('wrong'), 300);
-    }
+    if (span) { span.classList.add('wrong'); setTimeout(() => span.classList.remove('wrong'), 300); }
   }
 }
 
@@ -557,33 +907,31 @@ function showLessonComplete() {
   playFanfare();
   mascotSpin();
 
-  const accuracy = Math.round(((totalChars - mistakes) / totalChars) * 100);
+  const accuracy = totalChars > 0 ? Math.round(((totalChars - mistakes) / totalChars) * 100) : 100;
   const stars = accuracy >= 95 ? 3 : accuracy >= 80 ? 2 : 1;
   totalStars += stars;
   document.getElementById('star-count').textContent = totalStars;
 
-  // Save progress
   const nextLevel = currentLevel + 1 < LEVELS.length ? currentLevel + 1 : currentLevel;
-  localStorage.setItem('typeles_progress', JSON.stringify({level: nextLevel, stars: totalStars}));
+  localStorage.setItem('typeles_progress', JSON.stringify({ level: nextLevel, stars: totalStars }));
 
+  const hasNext = currentLevel + 1 < LEVELS.length;
   const overlay = document.getElementById('overlay');
   overlay.innerHTML = `
     <h2>🎉 Goed gedaan!</h2>
     <div id="stars-display">${'⭐'.repeat(stars)}${'☆'.repeat(3-stars)}</div>
     <p>Nauwkeurigheid: ${accuracy}%<br>Totale sterren: ${totalStars} ⭐</p>
-    ${currentLevel + 1 < LEVELS.length
-      ? `<button class="btn" onclick="nextLevel()">Volgende niveau →</button>`
-      : `<h2>🏆 Je hebt alles gehaald!</h2>`
+    ${hasNext
+      ? `<button class="btn" id="btn-next" onclick="nextLevel()">Volgende niveau →</button>`
+      : `<h2 style="color:#ffd700">🏆 Je hebt alles gehaald!</h2>`
     }
-    <button class="btn secondary" onclick="repeatLevel()">Herhaal niveau</button>
+    <button class="btn secondary" id="btn-repeat" onclick="repeatLevel()">Herhaal niveau</button>
+    <p style="font-size:.8rem;color:#556;margin-top:-8px">of druk Enter om door te gaan</p>
   `;
   overlay.classList.remove('hidden');
 
-  // Confetti burst
-  for(let i=0;i<5;i++) {
-    setTimeout(() => {
-      spawnConfetti(Math.random()*window.innerWidth, Math.random()*window.innerHeight/2);
-    }, i*200);
+  for (let i = 0; i < 5; i++) {
+    setTimeout(() => spawnConfetti(Math.random()*window.innerWidth, Math.random()*window.innerHeight/2), i*200);
   }
 }
 
@@ -599,13 +947,43 @@ function repeatLevel() {
 
 // ==================== INPUT ====================
 document.addEventListener('keydown', (e) => {
-  if(e.ctrlKey || e.altKey || e.metaKey) return;
-  if(e.key.length === 1) {
+  if (e.ctrlKey || e.altKey || e.metaKey) return;
+
+  // ── 1. Godmode buffer (always track, doesn't interfere with gameplay) ──
+  if (e.key.length === 1) {
+    godmodeBuffer += e.key.toLowerCase();
+    if (godmodeBuffer.length > GODMODE_CODE.length) {
+      godmodeBuffer = godmodeBuffer.slice(-GODMODE_CODE.length);
+    }
+    if (!godmodeActive && godmodeBuffer === GODMODE_CODE) {
+      activateGodmode();
+    }
+  }
+
+  // ── 2. Enter on main overlay triggers primary button ──
+  if (e.key === 'Enter') {
+    const overlay = document.getElementById('overlay');
+    if (!overlay.classList.contains('hidden')) {
+      e.preventDefault();
+      // Primary button = first .btn that isn't .secondary
+      const primaryBtn = overlay.querySelector('.btn:not(.secondary)');
+      if (primaryBtn) { primaryBtn.click(); return; }
+      // If only secondary buttons exist (e.g. all-complete screen), click first btn
+      const anyBtn = overlay.querySelector('.btn');
+      if (anyBtn) { anyBtn.click(); return; }
+    }
+  }
+
+  // ── 3. Block all game input during character reveal ──
+  if (revealActive) return;
+
+  // ── 4. Normal game typing (overlay must be hidden) ──
+  const overlay = document.getElementById('overlay');
+  if (!overlay.classList.contains('hidden')) return;
+
+  if (e.key.length === 1) {
     e.preventDefault();
     handleKey(e.key);
-  } else if(e.key === ' ') {
-    e.preventDefault();
-    handleKey(' ');
   }
 });
 
