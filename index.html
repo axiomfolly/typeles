@@ -707,6 +707,60 @@ function showCharacterReveal(charKey, onDismiss) {
   }, { once: true });
 }
 
+// ==================== MINI CHARACTER FLASH ====================
+// For levels 4 & 5: show a brief auto-dismissing character card when a hero name is typed
+function showCharacterFlash(charKey, onDone) {
+  const data = BONUS_CHARACTERS[charKey];
+  if (!data) { onDone(); return; }
+
+  const [bg1, bg2] = data.bg.split(',');
+  const displayName = charKey.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
+  const card = document.createElement('div');
+  card.style.cssText = `
+    position:fixed; left:50%; top:50%; transform:translate(-50%,-50%) scale(0);
+    background:linear-gradient(135deg,${bg1},${bg2});
+    border-radius:20px; padding:24px 36px; z-index:150;
+    text-align:center; box-shadow:0 8px 40px rgba(0,0,0,.7);
+    pointer-events:none; transition:transform .25s cubic-bezier(.34,1.56,.64,1), opacity .25s;
+    min-width:220px;
+  `;
+  card.innerHTML = `
+    <div style="font-size:3.5rem;margin-bottom:8px">${data.emoji}</div>
+    <div style="font-size:1.3rem;font-weight:bold;color:#fff;margin-bottom:6px">${displayName}</div>
+    <div style="font-size:.85rem;color:rgba(255,255,255,.8);font-style:italic">"${data.quote}"</div>
+    <div id="flash-img-wrap" style="margin-top:10px;display:flex;justify-content:center"></div>
+  `;
+  document.body.appendChild(card);
+
+  // Animate in
+  requestAnimationFrame(() => {
+    card.style.transform = 'translate(-50%,-50%) scale(1)';
+  });
+
+  playRevealJingle();
+
+  // Async wiki image — small thumbnail
+  if (data.wiki) {
+    fetchWikiImage(data.wiki).then(url => {
+      if (!url) return;
+      const wrap = card.querySelector('#flash-img-wrap');
+      if (!wrap) return;
+      const img = document.createElement('img');
+      img.style.cssText = 'width:70px;height:70px;object-fit:cover;object-position:top;border-radius:50%;border:2px solid rgba(255,255,255,.5)';
+      img.src = url;
+      wrap.appendChild(img);
+    });
+  }
+
+  // Auto-dismiss after 2.2s
+  setTimeout(() => {
+    card.style.opacity = '0';
+    card.style.transform = 'translate(-50%,-60%) scale(0.9)';
+    setTimeout(() => { card.remove(); onDone(); }, 250);
+  }, 2200);
+}
+
 // ==================== GODMODE ====================
 function activateGodmode() {
   if (godmodeActive) return;
@@ -862,7 +916,8 @@ function handleKey(key) {
 
       buildProgressDots();
 
-      // Level 7 bonus: show character reveal card
+      // Level 7 bonus: show full character reveal card
+      // Levels 4-5: show mini flash card if name is a known character
       if (LEVELS[currentLevel].bonus) {
         revealActive = true;
         setTimeout(() => {
@@ -878,6 +933,20 @@ function handleKey(key) {
             }
           });
         }, 350);
+      } else if (BONUS_CHARACTERS[target]) {
+        // Mini flash card for known characters in levels 4-5
+        currentItemIdx++;
+        currentCharIdx = 0;
+        buildProgressDots();
+        setTimeout(() => {
+          showCharacterFlash(target, () => {
+            if (currentItemIdx >= lessonItems.length) {
+              setTimeout(showLessonComplete, 400);
+            } else {
+              renderTarget();
+            }
+          });
+        }, 250);
       } else {
         currentItemIdx++;
         currentCharIdx = 0;
